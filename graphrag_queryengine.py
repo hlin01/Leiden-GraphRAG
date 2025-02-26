@@ -1,17 +1,18 @@
 import re
-
 from llama_index.core.query_engine import CustomQueryEngine
 from llama_index.core.llms import LLM, ChatMessage
 from llama_index.core import PropertyGraphIndex
-
 from graphrag_store import GraphRAGStore
 
 
+
 class GraphRAGQueryEngine(CustomQueryEngine):
+
     """
     A custom query engine that leverages community summaries from a property graph
     to answer queries using an LLM.
     """
+
     graph_store: GraphRAGStore
     index: PropertyGraphIndex
     llm: LLM
@@ -102,7 +103,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         """
         prompt = (
             f"Given the community summary: {community_summary}, "
-            f"how would you answer the following query? Query: {query}"
+            f"How would you answer the following query? Query: {query}"
         )
         messages = [
             ChatMessage(role="system", content=prompt),

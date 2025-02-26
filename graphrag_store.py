@@ -2,18 +2,19 @@ import re
 import networkx as nx
 from graspologic.partition import hierarchical_leiden
 from collections import defaultdict
-
 from llama_index.core.llms import ChatMessage
 from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
-
 from llama_index.llms.openai import OpenAI
 
 
+
 class GraphRAGStore(Neo4jPropertyGraphStore):
+
     """
     A property graph store that builds communities from the graph
     and generates summaries for each community using an LLM.
     """
+
     community_summary = {}
     entity_info = None
     max_cluster_size = 5
@@ -32,12 +33,7 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
             ChatMessage(
                 role="system",
                 content=(
-                    "You are provided with a set of relationships from a knowledge graph, each represented as "
-                    "entity1->entity2->relation->relationship_description. Your task is to create a summary of these "
-                    "relationships. The summary should include the names of the entities involved and a concise synthesis "
-                    "of the relationship descriptions. The goal is to capture the most critical and relevant details that "
-                    "highlight the nature and significance of each relationship. Ensure that the summary is coherent and "
-                    "integrates the information in a way that emphasizes the key aspects of the relationships."
+                    "You are provided with a set of relationships from a knowledge graph, each represented as entity1->entity2->relation->relationship_description. Your task is to create a comprehensive summary of these relationships. The summary should include the names of the entities involved and a concise synthesis of the relationship descriptions, capturing the most critical and relevant details that highlight the nature and significance of each relationship. Ensure that the summary is coherent, integrates the provided information, and emphasizes the key aspects of the relationships."
                 ),
             ),
             ChatMessage(role="user", content=text),
@@ -100,7 +96,6 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
             node = item.node
             cluster_id = item.cluster
 
-            # Update entity_info
             entity_info[node].add(cluster_id)
 
             for neighbor in nx_graph.neighbors(node):
@@ -112,7 +107,6 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
                     )
                     community_info[cluster_id].append(detail)
 
-        # Convert sets to lists for easier serialization if needed
         entity_info = {k: list(v) for k, v in entity_info.items()}
 
         return dict(entity_info), dict(community_info)

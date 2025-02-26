@@ -1,67 +1,78 @@
 import os
 from dotenv import load_dotenv
 from llama_index.llms.openai import OpenAI
-
 from llama_index.core.node_parser import SentenceSplitter
 from graphrag_extractor import GraphRAGExtractor
 from graphrag_store import GraphRAGStore
 from graphrag_queryengine import GraphRAGQueryEngine
 import re
 from typing import Any
-from llama_index.core import Document
+from llama_index.core import Document, PropertyGraphIndex
+from neo4j import GraphDatabase
 
-from llama_index.core import PropertyGraphIndex
 
 load_dotenv()
-os.environ["OPENAI_API_KEY"]
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+
 
 llm = OpenAI(model="gpt-4o", temperature=0)
+
 
 with open("anonymized_data_cl1.txt", "r") as f:
     notes = f.readlines()
 
+
 documents = [Document(text=note.strip()) for note in notes]
 
+
 splitter = SentenceSplitter(
-    chunk_size=1024,
+    chunk_size=512,
     chunk_overlap=32,
 )
 
-nodes = splitter.get_nodes_from_documents(documents)
-print(len(nodes))
+
+nodes = splitter.get_nodes_from_documents(documents, show_progress=True)
+
 
 KG_TRIPLET_EXTRACT_TMPL = """
--Goal-
-Given a text document, identify all entities and their entity types from the text and all relationships among the identified entities.
-Given the text, extract up to {max_knowledge_triplets} entity-relation triplets.
+Goal:
+Extract up to {max_knowledge_triplets} entity-relation triplets from the provided text. For each triplet, identify entities with their types and descriptions, and then determine the relationships between them.
 
--Steps-
-1. Identify all entities. For each identified entity, extract the following information:
-- entity_name: Name of the entity, capitalized
-- entity_type: Type of the entity
-- entity_description: Comprehensive description of the entity's attributes and activities
-Format each entity as ("entity"$$$$""$$$$""$$$$"")
+Instructions:
 
-2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are *clearly related* to each other.
-For each pair of related entities, extract the following information:
-- source_entity: name of the source entity, as identified in step 1
-- target_entity: name of the target entity, as identified in step 1
-- relation: relationship between source_entity and target_entity
-- relationship_description: explanation as to why you think the source entity and the target entity are related to each other
+1. Entity Extraction:
+   - Identify all entities mentioned in the text.
+   - For each entity, extract:
+     • entity_name: The name of the entity (ensure it is properly capitalized).
+     • entity_type: The category or type of the entity.
+     • entity_description: A detailed description covering the entity’s attributes and activities.
+   - Format each entity as:
+     ([ENTITY] | <entity_name> | <entity_type> | <entity_description>)
 
-Format each relationship as ("relationship"$$$$""$$$$""$$$$""$$$$"")
+2. Relationship Extraction:
+   - From the entities identified in step 1, find all pairs of entities that have a clear, meaningful relationship.
+   - For each related pair, extract:
+     • source_entity: The originating entity (as identified in step 1).
+     • target_entity: The related entity (as identified in step 1).
+     • relation: The type or nature of the relationship.
+     • relationship_description: A brief explanation detailing why the relationship exists.
+   - Format each relationship as:
+     ([RELATIONSHIP] | <source_entity> | <target_entity> | <relation> | <relationship_description>)
 
-3. When finished, output.
+3. Output:
+   - Provide the extracted entities and relationships in the specified formats.
 
--Real Data-
-######################
-text: {text}
-######################
-output:
+Real Data:
+####################
+Text: {text}
+
+####################
+Output:
 """
 
-entity_pattern = r'\("entity"\$\$\$\$"(.+?)"\$\$\$\$"(.+?)"\$\$\$\$"(.+?)"\)'
-relationship_pattern = r'\("relationship"\$\$\$\$"(.+?)"\$\$\$\$"(.+?)"\$\$\$\$"(.+?)"\$\$\$\$"(.+?)"\)'
+
+entity_pattern = r'\(\[ENTITY\] \| (.+?) \| (.+?) \| (.+?)\)'
+relationship_pattern = r'\(\[RELATIONSHIP\] \| (.+?) \| (.+?) \| (.+?) \| (.+?)\)'
 
 
 def parse_fn(response_str: str) -> Any:
@@ -77,9 +88,21 @@ kg_extractor = GraphRAGExtractor(
     parse_fn=parse_fn,
 )
 
+
+def clear_graph(uri, username, password):
+    driver = GraphDatabase.driver(uri, auth=(username, password))
+    with driver.session() as session:
+        session.run("MATCH (n) DETACH DELETE n")
+    driver.close()
+
+
+clear_graph("bolt://localhost:7687", "neo4j", "abcd@1234")
+
+
 graph_store = GraphRAGStore(
     username="neo4j", password="abcd@1234", url="bolt://localhost:7687"
 )
+
 
 index = PropertyGraphIndex(
     nodes=nodes,
@@ -88,11 +111,13 @@ index = PropertyGraphIndex(
     show_progress=True,
 )
 
-print(index.property_graph_store.get_triplets()[10])
-print(index.property_graph_store.get_triplets()[10][0].properties)
-print(index.property_graph_store.get_triplets()[10][1].properties)
+
+triplets = index.property_graph_store.get_triplets()
+print(triplets[10])
+
 
 index.property_graph_store.build_communities()
+
 
 query_engine = GraphRAGQueryEngine(
     graph_store=index.property_graph_store,
@@ -101,7 +126,6 @@ query_engine = GraphRAGQueryEngine(
     similarity_top_k=10,
 )
 
-response = query_engine.query(
-    "What are the main ideas discussed in the document?"
-)
+
+response = query_engine.query("What are CL's most pressing issues?")
 print(response)
