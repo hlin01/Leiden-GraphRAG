@@ -16,7 +16,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
     graph_store: GraphRAGStore
     index: PropertyGraphIndex
     llm: LLM
-    similarity_top_k: int = 20
+    similarity_top_k: int = 10
 
     def custom_query(self, query_str: str) -> str:
         """

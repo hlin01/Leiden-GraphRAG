@@ -32,7 +32,7 @@ class GraphRAGExtractor(TransformComponent):
         llm: Optional[LLM] = None,
         extract_prompt: Optional[Union[str, PromptTemplate]] = None,
         parse_fn: Callable = default_parse_triplets_fn,
-        max_paths_per_chunk: int = 10,
+        max_paths_per_chunk: int = 5,
         num_workers: int = 5,
     ) -> None:
         

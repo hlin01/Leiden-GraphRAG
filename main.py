@@ -26,7 +26,7 @@ documents = [Document(text=note.strip()) for note in notes]
 
 
 splitter = SentenceSplitter(
-    chunk_size=512,
+    chunk_size=256,
     chunk_overlap=32,
 )
 
@@ -36,7 +36,7 @@ nodes = splitter.get_nodes_from_documents(documents, show_progress=True)
 
 KG_TRIPLET_EXTRACT_TMPL = """
 Goal:
-Extract up to {max_knowledge_triplets} entity-relation triplets from the provided text. For each triplet, identify entities with their types and descriptions, and then determine the relationships between them.
+Extract up to {max_knowledge_triplets} entity-relation triplets from the provided text. For each triplet, identify entities (along with their types and descriptions) and determine the relationships between them.
 
 Instructions:
 
@@ -62,11 +62,11 @@ Instructions:
 3. Output:
    - Provide the extracted entities and relationships in the specified formats.
 
-Real Data:
-####################
+Provided Data:
+====================
 Text: {text}
 
-####################
+====================
 Output:
 """
 
@@ -84,7 +84,7 @@ def parse_fn(response_str: str) -> Any:
 kg_extractor = GraphRAGExtractor(
     llm=llm,
     extract_prompt=KG_TRIPLET_EXTRACT_TMPL,
-    max_paths_per_chunk=2,
+    max_paths_per_chunk=3,
     parse_fn=parse_fn,
 )
 
@@ -127,5 +127,5 @@ query_engine = GraphRAGQueryEngine(
 )
 
 
-response = query_engine.query("What are CL's most pressing issues?")
+response = query_engine.query("What are CL's most pressing issues that CM needs to deal with right away?")
 print(response)
