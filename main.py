@@ -84,7 +84,7 @@ def parse_fn(response_str: str) -> Any:
 kg_extractor = GraphRAGExtractor(
     llm=llm,
     extract_prompt=KG_TRIPLET_EXTRACT_TMPL,
-    max_paths_per_chunk=3,
+    max_paths_per_chunk=5,
     parse_fn=parse_fn,
 )
 
