@@ -6,7 +6,6 @@ from llama_index.core.llms import ChatMessage
 from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
 
 
-
 class GraphRAGStore(Neo4jPropertyGraphStore):
     """
     A property graph store that builds communities from the graph

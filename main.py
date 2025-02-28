@@ -11,7 +11,6 @@ from llama_index.core import Document, PropertyGraphIndex
 from neo4j import GraphDatabase
 
 
-
 load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 

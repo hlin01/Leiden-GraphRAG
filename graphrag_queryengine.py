@@ -5,7 +5,6 @@ from llama_index.core import PropertyGraphIndex
 from graphrag_store import GraphRAGStore
 
 
-
 class GraphRAGQueryEngine(CustomQueryEngine):
     """
     A custom query engine that leverages community summaries from a property graph

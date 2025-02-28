@@ -10,7 +10,6 @@ from llama_index.core.schema import TransformComponent, BaseNode
 from llama_index.core import Settings
 
 
-
 class GraphRAGExtractor(TransformComponent):
     """
     Extract triples from a graph using an LLM and a simple prompt/output parsing approach.
