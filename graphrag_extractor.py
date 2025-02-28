@@ -12,7 +12,6 @@ from llama_index.core import Settings
 
 
 class GraphRAGExtractor(TransformComponent):
-
     """
     Extract triples from a graph using an LLM and a simple prompt/output parsing approach.
     
@@ -27,6 +26,7 @@ class GraphRAGExtractor(TransformComponent):
     num_workers: int
     max_paths_per_chunk: int
 
+
     def __init__(
         self,
         llm: Optional[LLM] = None,
@@ -34,8 +34,7 @@ class GraphRAGExtractor(TransformComponent):
         parse_fn: Callable = default_parse_triplets_fn,
         max_paths_per_chunk: int = 5,
         num_workers: int = 5,
-    ) -> None:
-        
+    ) -> None:        
         """
         Initialize the GraphRAGExtractor.
 
@@ -58,9 +57,11 @@ class GraphRAGExtractor(TransformComponent):
             max_paths_per_chunk=max_paths_per_chunk,
         )
 
+
     @classmethod
     def class_name(cls) -> str:
         return "GraphExtractor"
+
 
     def __call__(
         self, nodes: List[BaseNode], show_progress: bool = False, **kwargs: Any
@@ -71,6 +72,7 @@ class GraphRAGExtractor(TransformComponent):
         return asyncio.run(
             self.acall(nodes, show_progress=show_progress, **kwargs)
         )
+
 
     async def _aextract(self, node: BaseNode) -> BaseNode:
         """
@@ -115,6 +117,7 @@ class GraphRAGExtractor(TransformComponent):
         node.metadata[KG_NODES_KEY] = existing_nodes
         node.metadata[KG_RELATIONS_KEY] = existing_relations
         return node
+
 
     async def acall(
         self, nodes: List[BaseNode], show_progress: bool = False, **kwargs: Any

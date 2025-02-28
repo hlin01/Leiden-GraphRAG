@@ -11,6 +11,7 @@ from llama_index.core import Document, PropertyGraphIndex
 from neo4j import GraphDatabase
 
 
+
 load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 
@@ -102,6 +103,7 @@ clear_graph("bolt://localhost:7687", "neo4j", "abcd@1234")
 graph_store = GraphRAGStore(
     username="neo4j", password="abcd@1234", url="bolt://localhost:7687"
 )
+graph_store.llm = llm
 
 
 index = PropertyGraphIndex(
@@ -113,10 +115,10 @@ index = PropertyGraphIndex(
 
 
 triplets = index.property_graph_store.get_triplets()
-print(triplets[10])
 
 
-index.property_graph_store.build_communities()
+community_summaries = index.property_graph_store.get_community_summaries()
+print(community_summaries)
 
 
 query_engine = GraphRAGQueryEngine(

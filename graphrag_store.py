@@ -4,20 +4,20 @@ from graspologic.partition import hierarchical_leiden
 from collections import defaultdict
 from llama_index.core.llms import ChatMessage
 from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
-from llama_index.llms.openai import OpenAI
 
 
 
 class GraphRAGStore(Neo4jPropertyGraphStore):
-
     """
     A property graph store that builds communities from the graph
     and generates summaries for each community using an LLM.
     """
 
+    llm = None
     community_summary = {}
     entity_info = None
     max_cluster_size = 5
+
 
     def generate_community_summary(self, text):
         """
@@ -38,22 +38,22 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
             ),
             ChatMessage(role="user", content=text),
         ]
-        response = OpenAI().chat(messages)
+        response = self.llm.chat(messages)
         clean_response = re.sub(r"^assistant:\s*", "", str(response)).strip()
         return clean_response
 
-    def build_communities(self):
+
+    def _summarize_communities(self, community_info):
         """
-        Builds communities from the graph and summarizes them.
+        Generate and store summaries for each community.
+
+        Args:
+            community_info (dict): Mapping from community IDs to relationship details.
         """
-        nx_graph = self._create_nx_graph()
-        community_hierarchical_clusters = hierarchical_leiden(
-            nx_graph, max_cluster_size=self.max_cluster_size
-        )
-        self.entity_info, community_info = self._collect_community_info(
-            nx_graph, community_hierarchical_clusters
-        )
-        self._summarize_communities(community_info)
+        for community_id, details in community_info.items():
+            details_text = "\n".join(details) + "."
+            self.community_summary[community_id] = self.generate_community_summary(details_text)
+
 
     def _create_nx_graph(self):
         """
@@ -74,6 +74,7 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
                 description=relation.properties["relationship_description"],
             )
         return nx_graph
+
 
     def _collect_community_info(self, nx_graph, clusters):
         """
@@ -102,8 +103,7 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
                 edge_data = nx_graph.get_edge_data(node, neighbor)
                 if edge_data:
                     detail = (
-                        f"{node} -> {neighbor} -> {edge_data['relationship']} -> "
-                        f"{edge_data['description']}"
+                        f"{node} -> {neighbor} -> {edge_data['relationship']} -> {edge_data['description']}"
                     )
                     community_info[cluster_id].append(detail)
 
@@ -111,16 +111,20 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
 
         return dict(entity_info), dict(community_info)
 
-    def _summarize_communities(self, community_info):
-        """
-        Generate and store summaries for each community.
 
-        Args:
-            community_info (dict): Mapping from community IDs to relationship details.
+    def build_communities(self):
         """
-        for community_id, details in community_info.items():
-            details_text = "\n".join(details) + "."
-            self.community_summary[community_id] = self.generate_community_summary(details_text)
+        Builds communities from the graph and summarizes them.
+        """
+        nx_graph = self._create_nx_graph()
+        community_hierarchical_clusters = hierarchical_leiden(
+            nx_graph, max_cluster_size=self.max_cluster_size
+        )
+        self.entity_info, community_info = self._collect_community_info(
+            nx_graph, community_hierarchical_clusters
+        )
+        self._summarize_communities(community_info)
+
 
     def get_community_summaries(self):
         """

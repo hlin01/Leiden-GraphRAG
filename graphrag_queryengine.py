@@ -7,7 +7,6 @@ from graphrag_store import GraphRAGStore
 
 
 class GraphRAGQueryEngine(CustomQueryEngine):
-
     """
     A custom query engine that leverages community summaries from a property graph
     to answer queries using an LLM.
@@ -17,6 +16,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
     index: PropertyGraphIndex
     llm: LLM
     similarity_top_k: int = 10
+
 
     def custom_query(self, query_str: str) -> str:
         """
@@ -43,6 +43,8 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         final_answer = self.aggregate_answers(community_answers)
         return final_answer
 
+
+    # try NER instead?
     def get_entities(self, query_str, similarity_top_k):
         """
         Retrieve relevant entities from the index based on the query string.
@@ -73,6 +75,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
 
         return list(entities)
 
+
     def retrieve_entity_communities(self, entity_info, entities):
         """
         Retrieve cluster information for given entities, allowing for multiple clusters per entity.
@@ -89,6 +92,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
             if entity in entity_info:
                 community_ids.extend(entity_info[entity])
         return list(set(community_ids))
+
 
     def generate_answer_from_summary(self, community_summary, query):
         """
@@ -115,6 +119,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         response = self.llm.chat(messages)
         cleaned_response = re.sub(r"^assistant:\s*", "", str(response)).strip()
         return cleaned_response
+
 
     def aggregate_answers(self, community_answers):
         """
