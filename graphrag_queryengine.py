@@ -43,7 +43,6 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         return final_answer
 
 
-    # try NER instead?
     def get_entities(self, query_str, similarity_top_k):
         """
         Retrieve relevant entities from the index based on the query string.
