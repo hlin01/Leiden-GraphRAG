@@ -43,26 +43,26 @@ Instructions:
 1. Entity Extraction:
    - Identify all entities mentioned in the text.
    - For each entity, extract:
-     • entity_name: The name of the entity (ensure it is properly capitalized).
-     • entity_type: The category or type of the entity.
-     • entity_description: A detailed description covering the entity’s attributes and activities.
+      - entity_name: The name of the entity (ensure it is properly capitalized).
+      - entity_type: The category or type of the entity.
+      - entity_description: A detailed description covering the entity’s attributes and activities.
    - Format each entity as:
-     ([ENTITY] | <entity_name> | <entity_type> | <entity_description>)
+      ([ENTITY] | <entity_name> | <entity_type> | <entity_description>)
 
 2. Relationship Extraction:
    - From the entities identified in step 1, find all pairs of entities that have a clear, meaningful relationship.
    - For each related pair, extract:
-     • source_entity: The originating entity (as identified in step 1).
-     • target_entity: The related entity (as identified in step 1).
-     • relation: The type or nature of the relationship.
-     • relationship_description: A brief explanation detailing why the relationship exists.
+      - source_entity: The originating entity (as identified in step 1).
+      - target_entity: The related entity (as identified in step 1).
+      - relation: The type or nature of the relationship.
+      - relationship_description: A brief explanation detailing why the relationship exists.
    - Format each relationship as:
-     ([RELATIONSHIP] | <source_entity> | <target_entity> | <relation> | <relationship_description>)
+      ([RELATIONSHIP] | <source_entity> | <target_entity> | <relation> | <relationship_description>)
 
 3. Output:
    - Provide the extracted entities and relationships in the specified formats.
 
-Provided Data:
+Actual Data:
 ====================
 Text: {text}
 

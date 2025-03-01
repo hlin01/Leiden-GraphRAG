@@ -32,7 +32,7 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
             ChatMessage(
                 role="system",
                 content=(
-                    "You are provided with a set of relationships from a knowledge graph, each represented as entity1->entity2->relation->relationship_description. Your task is to create a comprehensive summary of these relationships. The summary should include the names of the entities involved and a concise synthesis of the relationship descriptions, capturing the most critical and relevant details that highlight the nature and significance of each relationship. Ensure that the summary is coherent, integrates the provided information, and emphasizes the key aspects of the relationships."
+                    "You are provided with a set of relationships from a knowledge graph, each represented as 'entity1 -> entity2 -> relation -> relationship_description'. Your task is to create a comprehensive summary of these relationships. The summary should include the names of the entities involved and a concise synthesis of the relationship descriptions, capturing the most critical and relevant details that highlight the nature and significance of each relationship. Ensure that the summary is coherent, integrates the provided information, and emphasizes the key aspects of the relationships."
                 ),
             ),
             ChatMessage(role="user", content=text),
