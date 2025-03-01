@@ -22,7 +22,7 @@ with open("anonymized_data_cl1.txt", "r") as f:
     notes = f.readlines()
 
 
-documents = [Document(text=note.strip()) for note in notes]
+documents = [Document(text=note.strip()) for note in notes[:10]]
 
 
 splitter = SentenceSplitter(
