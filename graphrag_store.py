@@ -50,7 +50,7 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
             community_info (dict): Mapping from community IDs to relationship details.
         """
         for community_id, details in community_info.items():
-            details_text = "\n".join(details) + "."
+            details_text = "\n".join(details)
             self.community_summary[community_id] = self.generate_community_summary(details_text)
 
 

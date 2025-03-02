@@ -103,6 +103,7 @@ graph_store = GraphRAGStore(
     username="neo4j", password="abcd@1234", url="bolt://localhost:7687"
 )
 graph_store.llm = llm
+graph_store.max_cluster_size = 5
 
 
 index = PropertyGraphIndex(
