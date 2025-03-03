@@ -22,7 +22,7 @@ with open("anonymized_data_cl1.txt", "r") as f:
     notes = f.readlines()
 
 
-documents = [Document(text=note.strip()) for note in notes[:10]]
+documents = [Document(text=note.strip()) for note in notes]
 
 
 splitter = SentenceSplitter(
@@ -118,7 +118,7 @@ triplets = index.property_graph_store.get_triplets()
 
 
 community_summaries = index.property_graph_store.get_community_summaries()
-print(community_summaries)
+# print(community_summaries)
 
 
 query_engine = GraphRAGQueryEngine(
@@ -129,5 +129,5 @@ query_engine = GraphRAGQueryEngine(
 )
 
 
-response = query_engine.query("What are CL's most pressing issues that CM needs to deal with right away?")
+response = query_engine.query("Summarize CL’s case.")
 print(response)
