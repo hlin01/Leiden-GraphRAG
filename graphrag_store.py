@@ -37,8 +37,10 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
             ),
             ChatMessage(role="user", content=text),
         ]
+        print(text)
         response = self.llm.chat(messages)
         clean_response = re.sub(r"^assistant:\s*", "", str(response)).strip()
+        print(clean_response)
         return clean_response
 
 

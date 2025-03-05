@@ -22,7 +22,7 @@ with open("anonymized_data_cl1.txt", "r") as f:
     notes = f.readlines()
 
 
-documents = [Document(text=note.strip()) for note in notes]
+documents = [Document(text=note.strip()) for note in notes[:5]]
 
 
 splitter = SentenceSplitter(
@@ -114,10 +114,11 @@ index = PropertyGraphIndex(
 )
 
 
-triplets = index.property_graph_store.get_triplets()
+# triplets = index.property_graph_store.get_triplets()
+# print(triplets)
 
 
-community_summaries = index.property_graph_store.get_community_summaries()
+# community_summaries = index.property_graph_store.get_community_summaries()
 # print(community_summaries)
 
 
