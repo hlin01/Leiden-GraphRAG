@@ -55,6 +55,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
             list: A list of unique entities extracted from the retrieved nodes.
         """
         nodes_retrieved = self.index.as_retriever(
+            # replace with similarity threshold
             similarity_top_k=similarity_top_k
         ).retrieve(query_str)
 
@@ -94,7 +95,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
 
     def generate_answer_from_summary(self, community_summary, query):
         """
-        Generate an answer from a community summary based on a given query using LLM.
+        Generate an answer from a community summary based on a given query using an LLM.
 
         Args:
             community_summary (str): The summary of the community.
@@ -104,8 +105,8 @@ class GraphRAGQueryEngine(CustomQueryEngine):
             str: The generated answer based on the summary.
         """
         prompt = (
-            f"Given the community summary: {community_summary}, "
-            f"How would you answer the following query? Query: {query}"
+            f"Given the community summary:\n{community_summary}\n\n"
+            f"How would you answer the following query?\nQuery: {query}"
         )
         messages = [
             ChatMessage(role="system", content=prompt),
@@ -121,7 +122,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
 
     def aggregate_answers(self, community_answers):
         """
-        Aggregate individual community answers into a final, coherent response.
+        Aggregate individual community answers into a final response.
 
         Args:
             community_answers (list): List of answers from different communities.
@@ -129,7 +130,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         Returns:
             str: The final aggregated answer.
         """
-        prompt = "Combine the following intermediate answers into a final, concise response."
+        prompt = "Combine the following intermediate answers into a final, concise and coherent response."
         messages = [
             ChatMessage(role="system", content=prompt),
             ChatMessage(
@@ -138,7 +139,5 @@ class GraphRAGQueryEngine(CustomQueryEngine):
             ),
         ]
         final_response = self.llm.chat(messages)
-        cleaned_final_response = re.sub(
-            r"^assistant:\s*", "", str(final_response)
-        ).strip()
+        cleaned_final_response = re.sub(r"^assistant:\s*", "", str(final_response)).strip()
         return cleaned_final_response

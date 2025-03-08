@@ -1,10 +1,10 @@
 import os
 from dotenv import load_dotenv
 from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core.node_parser import SentenceSplitter
 from graphrag_extractor import GraphRAGExtractor
 from graphrag_store import GraphRAGStore
-from graphrag_queryengine import GraphRAGQueryEngine
 import re
 from typing import Any
 from llama_index.core import Document, PropertyGraphIndex
@@ -15,14 +15,15 @@ load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 
-llm = OpenAI(model="gpt-4o", temperature=0)
+llm = OpenAI(model="gpt-4o", temperature=1)
+embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 
 
 with open("anonymized_data_cl1.txt", "r") as f:
     notes = f.readlines()
 
 
-documents = [Document(text=note.strip()) for note in notes[:5]]
+documents = [Document(text=note.strip()) for note in notes]
 
 
 splitter = SentenceSplitter(
@@ -84,8 +85,8 @@ def parse_fn(response_str: str) -> Any:
 kg_extractor = GraphRAGExtractor(
     llm=llm,
     extract_prompt=KG_TRIPLET_EXTRACT_TMPL,
-    max_paths_per_chunk=5,
     parse_fn=parse_fn,
+    max_paths_per_chunk=5,
 )
 
 
@@ -100,7 +101,7 @@ clear_graph("bolt://localhost:7687", "neo4j", "abcd@1234")
 
 
 graph_store = GraphRAGStore(
-    username="neo4j", password="abcd@1234", url="bolt://localhost:7687"
+    username="neo4j", password="abcd@1234", url="bolt://localhost:7687",
 )
 graph_store.llm = llm
 graph_store.max_cluster_size = 5
@@ -108,27 +109,9 @@ graph_store.max_cluster_size = 5
 
 index = PropertyGraphIndex(
     nodes=nodes,
+    llm=llm,
     kg_extractors=[kg_extractor],
     property_graph_store=graph_store,
+    embed_model=embed_model,
     show_progress=True,
 )
-
-
-# triplets = index.property_graph_store.get_triplets()
-# print(triplets)
-
-
-# community_summaries = index.property_graph_store.get_community_summaries()
-# print(community_summaries)
-
-
-query_engine = GraphRAGQueryEngine(
-    graph_store=index.property_graph_store,
-    llm=llm,
-    index=index,
-    similarity_top_k=10,
-)
-
-
-response = query_engine.query("Summarize CL’s case.")
-print(response)

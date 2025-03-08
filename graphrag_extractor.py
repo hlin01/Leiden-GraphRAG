@@ -7,7 +7,6 @@ from llama_index.core.llms.llm import LLM
 from llama_index.core.prompts import PromptTemplate
 from llama_index.core.prompts.default_prompts import DEFAULT_KG_TRIPLET_EXTRACT_PROMPT
 from llama_index.core.schema import TransformComponent, BaseNode
-from llama_index.core import Settings
 
 
 class GraphRAGExtractor(TransformComponent):
@@ -22,8 +21,8 @@ class GraphRAGExtractor(TransformComponent):
     llm: LLM
     extract_prompt: PromptTemplate
     parse_fn: Callable
-    num_workers: int
     max_paths_per_chunk: int
+    num_workers: int
 
 
     def __init__(
@@ -38,7 +37,7 @@ class GraphRAGExtractor(TransformComponent):
         Initialize the GraphRAGExtractor.
 
         Args:
-            llm (LLM): The language model to use. If None, a default is used.
+            llm (LLM): The language model to use.
             extract_prompt (str or PromptTemplate): The prompt to guide the LLM.
             parse_fn (callable): Function to parse the LLM output.
             max_paths_per_chunk (int): Maximum number of paths/triples per node.
@@ -49,11 +48,11 @@ class GraphRAGExtractor(TransformComponent):
             extract_prompt = PromptTemplate(extract_prompt)
 
         super().__init__(
-            llm=llm or Settings.llm,
+            llm=llm,
             extract_prompt=extract_prompt or DEFAULT_KG_TRIPLET_EXTRACT_PROMPT,
             parse_fn=parse_fn,
-            num_workers=num_workers,
             max_paths_per_chunk=max_paths_per_chunk,
+            num_workers=num_workers,
         )
 
 
