@@ -55,7 +55,6 @@ class GraphRAGQueryEngine(CustomQueryEngine):
             list: A list of unique entities extracted from the retrieved nodes.
         """
         nodes_retrieved = self.index.as_retriever(
-            # replace with similarity threshold
             similarity_top_k=similarity_top_k
         ).retrieve(query_str)
 
