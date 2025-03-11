@@ -1,4 +1,6 @@
+import os
 import re
+import pickle
 import networkx as nx
 from graspologic.partition import hierarchical_leiden
 from collections import defaultdict
@@ -135,3 +137,30 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
         if not self.community_summary:
             self.build_communities()
         return self.community_summary
+
+
+    def load_state(self, state_file="state.pkl"):
+        if os.path.exists(state_file):
+            try:
+                with open(state_file, "rb") as f:
+                    state = pickle.load(f)
+                self.community_summary = state.get("community_summary", {})
+                self.entity_info = state.get("entity_info", None)
+                print(f"State loaded successfully from {state_file}.")
+            except Exception as e:
+                print(f"An error occurred while loading state: {e}")
+        else:
+            print("No saved state file found.")
+
+
+    def save_state(self, state_file="state.pkl"):
+        state = {
+            "community_summary": self.community_summary,
+            "entity_info": self.entity_info,
+        }
+        try:
+            with open(state_file, "wb") as f:
+                pickle.dump(state, f)
+            print(f"State saved successfully to {state_file}.")
+        except Exception as e:
+            print(f"An error occurred while saving state: {e}")

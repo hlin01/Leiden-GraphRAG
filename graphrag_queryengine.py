@@ -59,7 +59,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         ).retrieve(query_str)
 
         entities = set()
-        pattern = r"^(\w+(?:\s+\w+)*)\s*->\s*([a-zA-Z\s]+?)\s*->\s*(\w+(?:\s+\w+)*)$"
+        pattern = r"^([A-Za-z0-9\s\-',\.\(\)]+)\s*->\s*([A-Za-z\s\-\:]+)\s*->\s*([A-Za-z0-9\s\-',\.\(\)]+)$"
 
         for node in nodes_retrieved:
             matches = re.findall(

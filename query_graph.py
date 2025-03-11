@@ -18,6 +18,9 @@ embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 graph_store = GraphRAGStore(
     username="neo4j", password="abcd@1234", url="bolt://localhost:7687",
 )
+
+
+graph_store.load_state()
 graph_store.llm = llm
 graph_store.max_cluster_size = 5
 
@@ -30,12 +33,11 @@ index = PropertyGraphIndex.from_existing(
 )
 
 
-triplets = index.property_graph_store.get_triplets()
+# triplets = index.property_graph_store.get_triplets()
 # print(triplets)
-
-
 community_summaries = index.property_graph_store.get_community_summaries()
 # print(community_summaries)
+index.property_graph_store.save_state()
 
 
 query_engine = GraphRAGQueryEngine(
@@ -46,5 +48,5 @@ query_engine = GraphRAGQueryEngine(
 )
 
 
-response = query_engine.query("What are the primary challenges for CL (client) to find stable housing?")
+response = query_engine.query("Tell me about CL's case history.")
 print(response)
