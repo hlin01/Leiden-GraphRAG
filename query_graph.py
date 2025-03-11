@@ -46,5 +46,5 @@ query_engine = GraphRAGQueryEngine(
 )
 
 
-response = query_engine.query("What are the most important things to know about CL as their case manager?")
+response = query_engine.query("What are the primary challenges for CL (client) to find stable housing?")
 print(response)
