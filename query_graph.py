@@ -48,5 +48,5 @@ query_engine = GraphRAGQueryEngine(
 )
 
 
-response = query_engine.query("Tell me about CL's case history.")
+response = query_engine.query("What are some pressing issues CL is facing?")
 print(response)

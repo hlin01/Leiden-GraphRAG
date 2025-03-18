@@ -103,15 +103,18 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         Returns:
             str: The generated answer based on the summary.
         """
-        prompt = (
+        system_prompt = (
+            "You are an AI assistant specialized in supporting social workers. Using the provided community summary (derived from case notes) as context, answer queries about cases with utmost accuracy and specificity. Ensure that your responses are precise, fact-based, and tailored to the given query and details of each case."
+        )
+        user_prompt = (
             f"Given the community summary:\n{community_summary}\n\n"
             f"How would you answer the following query?\nQuery: {query}"
         )
         messages = [
-            ChatMessage(role="system", content=prompt),
+            ChatMessage(role="system", content=system_prompt),
             ChatMessage(
                 role="user",
-                content="I need an answer based on the above information.",
+                content=user_prompt,
             ),
         ]
         response = self.llm.chat(messages)
@@ -129,7 +132,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         Returns:
             str: The final aggregated answer.
         """
-        prompt = "Combine the following intermediate answers into a final, concise and coherent response."
+        prompt = "The intermediate answers below were each generated in response to the same query by an AI assistant specialized in supporting social workers. Each answer was crafted using a different community summary derived from case notes to ensure accuracy and specificity. Combine the following intermediate answers into a final, concise, and coherent response."
         messages = [
             ChatMessage(role="system", content=prompt),
             ChatMessage(
