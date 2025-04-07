@@ -113,6 +113,7 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
         return dict(entity_info), dict(community_info)
 
 
+    # review hierarchical_leiden method
     def build_communities(self):
         """
         Builds communities from the graph and summarizes them.

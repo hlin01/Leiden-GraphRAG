@@ -61,17 +61,7 @@ class GraphRAGExtractor(TransformComponent):
         return "GraphExtractor"
 
 
-    def __call__(
-        self, nodes: List[BaseNode], show_progress: bool = False, **kwargs: Any
-    ) -> List[BaseNode]:
-        """
-        Synchronously extract triples from a list of nodes.
-        """
-        return asyncio.run(
-            self.acall(nodes, show_progress=show_progress, **kwargs)
-        )
-
-
+    # review how extraction works
     async def _aextract(self, node: BaseNode) -> BaseNode:
         """
         Asynchronously extract triples from a single node.
@@ -129,4 +119,15 @@ class GraphRAGExtractor(TransformComponent):
             workers=self.num_workers,
             show_progress=show_progress,
             desc="Extracting paths from text",
+        )
+
+
+    def __call__(
+        self, nodes: List[BaseNode], show_progress: bool = False, **kwargs: Any
+    ) -> List[BaseNode]:
+        """
+        Synchronously extract triples from a list of nodes.
+        """
+        return asyncio.run(
+            self.acall(nodes, show_progress=show_progress, **kwargs)
         )

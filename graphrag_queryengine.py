@@ -17,32 +17,6 @@ class GraphRAGQueryEngine(CustomQueryEngine):
     similarity_top_k: int = 10
 
 
-    def custom_query(self, query_str: str) -> str:
-        """
-        Process all community summaries to generate an answer to a specific query.
-
-        Args:
-            query_str (str): The user's query string.
-
-        Returns:
-            str: The final aggregated answer.
-        """
-        entities = self.get_entities(query_str, self.similarity_top_k)
-
-        community_ids = self.retrieve_entity_communities(
-            self.graph_store.entity_info, entities
-        )
-        community_summaries = self.graph_store.get_community_summaries()
-        community_answers = [
-            self.generate_answer_from_summary(community_summary, query_str)
-            for id, community_summary in community_summaries.items()
-            if id in community_ids
-        ]
-
-        final_answer = self.aggregate_answers(community_answers)
-        return final_answer
-
-
     def get_entities(self, query_str, similarity_top_k):
         """
         Retrieve relevant entities from the index based on the query string.
@@ -122,6 +96,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         return cleaned_response
 
 
+    # pass in original query here as well?
     def aggregate_answers(self, community_answers):
         """
         Aggregate individual community answers into a final response.
@@ -143,3 +118,29 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         final_response = self.llm.chat(messages)
         cleaned_final_response = re.sub(r"^assistant:\s*", "", str(final_response)).strip()
         return cleaned_final_response
+
+
+    def custom_query(self, query_str: str) -> str:
+        """
+        Process all community summaries to generate an answer to a specific query.
+
+        Args:
+            query_str (str): The user's query string.
+
+        Returns:
+            str: The final aggregated answer.
+        """
+        entities = self.get_entities(query_str, self.similarity_top_k)
+
+        community_ids = self.retrieve_entity_communities(
+            self.graph_store.entity_info, entities
+        )
+        community_summaries = self.graph_store.get_community_summaries()
+        community_answers = [
+            self.generate_answer_from_summary(community_summary, query_str)
+            for id, community_summary in community_summaries.items()
+            if id in community_ids
+        ]
+
+        final_answer = self.aggregate_answers(community_answers)
+        return final_answer
