@@ -24,15 +24,17 @@ with open("anonymized_data_cl1.txt", "r") as f:
 
 
 documents = [Document(text=note.strip()) for note in notes]
+print(f"Number of documents: {len(documents)}")
 
 
 splitter = SentenceSplitter(
-    chunk_size=256,
-    chunk_overlap=32,
+    chunk_size=1024,
+    chunk_overlap=0,
 )
 
 
 nodes = splitter.get_nodes_from_documents(documents, show_progress=True)
+print(f"Number of nodes: {len(nodes)}")
 
 
 KG_TRIPLET_EXTRACT_TMPL = """
