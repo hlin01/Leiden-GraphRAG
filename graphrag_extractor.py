@@ -21,7 +21,6 @@ class GraphRAGExtractor(TransformComponent):
     llm: LLM
     extract_prompt: PromptTemplate
     parse_fn: Callable
-    max_paths_per_chunk: int
     num_workers: int
 
 
@@ -30,7 +29,6 @@ class GraphRAGExtractor(TransformComponent):
         llm: Optional[LLM] = None,
         extract_prompt: Optional[Union[str, PromptTemplate]] = None,
         parse_fn: Callable = default_parse_triplets_fn,
-        max_paths_per_chunk: int = 5,
         num_workers: int = 5,
     ) -> None:        
         """
@@ -40,7 +38,6 @@ class GraphRAGExtractor(TransformComponent):
             llm (LLM): The language model to use.
             extract_prompt (str or PromptTemplate): The prompt to guide the LLM.
             parse_fn (callable): Function to parse the LLM output.
-            max_paths_per_chunk (int): Maximum number of paths/triples per node.
             num_workers (int): Number of parallel workers for asynchronous processing.
         """
 
@@ -51,7 +48,6 @@ class GraphRAGExtractor(TransformComponent):
             llm=llm,
             extract_prompt=extract_prompt or DEFAULT_KG_TRIPLET_EXTRACT_PROMPT,
             parse_fn=parse_fn,
-            max_paths_per_chunk=max_paths_per_chunk,
             num_workers=num_workers,
         )
 
@@ -61,7 +57,6 @@ class GraphRAGExtractor(TransformComponent):
         return "GraphExtractor"
 
 
-    # review how extraction works
     async def _aextract(self, node: BaseNode) -> BaseNode:
         """
         Asynchronously extract triples from a single node.
@@ -73,7 +68,6 @@ class GraphRAGExtractor(TransformComponent):
             llm_response = await self.llm.apredict(
                 self.extract_prompt,
                 text=text,
-                max_knowledge_triplets=self.max_paths_per_chunk,
             )
             entities, entities_relationship = self.parse_fn(llm_response)
         except ValueError:

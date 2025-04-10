@@ -17,6 +17,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
     similarity_top_k: int = 10
 
 
+    # what exactly is being retrieved by as_retriever in get_entities?
     def get_entities(self, query_str, similarity_top_k):
         """
         Retrieve relevant entities from the index based on the query string.

@@ -15,7 +15,7 @@ load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 
-llm = OpenAI(model="gpt-4o", temperature=1)
+llm = OpenAI(model="gpt-4o", temperature=0.5)
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 
 
@@ -37,12 +37,12 @@ nodes = splitter.get_nodes_from_documents(documents, show_progress=True)
 
 KG_TRIPLET_EXTRACT_TMPL = """
 Goal:
-Extract up to {max_knowledge_triplets} entity-relation triplets from the provided text. For each triplet, identify entities (along with their types and descriptions) and determine the relationships between them.
+Extract entity-relation triplets from the provided text. For each triplet, identify important entities (along with their types and descriptions) and determine the relationships between them.
 
 Instructions:
 
 1. Entity Extraction:
-   - Identify all entities mentioned in the text.
+   - Identify all relevant entities mentioned in the text.
    - For each entity, extract:
       - entity_name: The name of the entity (ensure it is properly capitalized).
       - entity_type: The category or type of the entity.
@@ -86,7 +86,6 @@ kg_extractor = GraphRAGExtractor(
     llm=llm,
     extract_prompt=KG_TRIPLET_EXTRACT_TMPL,
     parse_fn=parse_fn,
-    max_paths_per_chunk=5,
 )
 
 
