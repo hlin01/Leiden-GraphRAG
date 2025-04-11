@@ -17,7 +17,6 @@ class GraphRAGQueryEngine(CustomQueryEngine):
     similarity_top_k: int = 10
 
 
-    # what exactly is being retrieved by as_retriever in get_entities?
     def get_entities(self, query_str, similarity_top_k):
         """
         Retrieve relevant entities from the index based on the query string.
@@ -29,8 +28,9 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         Returns:
             list: A list of unique entities extracted from the retrieved nodes.
         """
+        # similarity top k doesn't work
         nodes_retrieved = self.index.as_retriever(
-            similarity_top_k=similarity_top_k
+            similarity_top_k=similarity_top_k,
         ).retrieve(query_str)
 
         entities = set()
@@ -38,7 +38,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
 
         for node in nodes_retrieved:
             matches = re.findall(
-                pattern, node.text, re.MULTILINE | re.IGNORECASE
+                pattern, node.text, re.MULTILINE | re.IGNORECASE,
             )
             for match in matches:
                 subject = match[0]
@@ -134,7 +134,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         entities = self.get_entities(query_str, self.similarity_top_k)
 
         community_ids = self.retrieve_entity_communities(
-            self.graph_store.entity_info, entities
+            self.graph_store.entity_info, entities,
         )
         community_summaries = self.graph_store.get_community_summaries()
         community_answers = [

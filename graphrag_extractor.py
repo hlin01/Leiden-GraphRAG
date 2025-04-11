@@ -80,7 +80,7 @@ class GraphRAGExtractor(TransformComponent):
         for entity, entity_type, description in entities:
             entity_metadata["entity_description"] = description
             entity_node = EntityNode(
-                name=entity, label=entity_type, properties=entity_metadata
+                name=entity, label=entity_type, properties=entity_metadata,
             )
             existing_nodes.append(entity_node)
 

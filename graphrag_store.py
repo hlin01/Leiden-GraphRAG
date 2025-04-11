@@ -17,7 +17,9 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
     llm = None
     community_summary = {}
     entity_info = None
-    max_cluster_size = 5
+    max_cluster_size = 10
+    resolution = 1.0
+    randomness = 0.001
 
 
     def generate_community_summary(self, text):
@@ -113,17 +115,16 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
         return dict(entity_info), dict(community_info)
 
 
-    # review hierarchical_leiden method
     def build_communities(self):
         """
         Builds communities from the graph and summarizes them.
         """
         nx_graph = self._create_nx_graph()
         community_hierarchical_clusters = hierarchical_leiden(
-            nx_graph, max_cluster_size=self.max_cluster_size
+            nx_graph, max_cluster_size=self.max_cluster_size, resolution=self.resolution, randomness=self.randomness,
         )
         self.entity_info, community_info = self._collect_community_info(
-            nx_graph, community_hierarchical_clusters
+            nx_graph, community_hierarchical_clusters,
         )
         self._summarize_communities(community_info)
 

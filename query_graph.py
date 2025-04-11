@@ -22,7 +22,9 @@ graph_store = GraphRAGStore(
 
 graph_store.load_state()
 graph_store.llm = llm
-graph_store.max_cluster_size = 5
+graph_store.max_cluster_size = 10
+graph_store.resolution = 1.0
+graph_store.randomness = 0.001
 
 
 index = PropertyGraphIndex.from_existing(

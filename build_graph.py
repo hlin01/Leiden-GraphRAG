@@ -24,17 +24,15 @@ with open("anonymized_data_cl1.txt", "r") as f:
 
 
 documents = [Document(text=note.strip()) for note in notes]
-print(f"Number of documents: {len(documents)}")
 
 
 splitter = SentenceSplitter(
-    chunk_size=1024,
+    chunk_size=1500,
     chunk_overlap=0,
 )
 
 
 nodes = splitter.get_nodes_from_documents(documents, show_progress=True)
-print(f"Number of nodes: {len(nodes)}")
 
 
 KG_TRIPLET_EXTRACT_TMPL = """
@@ -105,7 +103,9 @@ graph_store = GraphRAGStore(
     username="neo4j", password="abcd@1234", url="bolt://localhost:7687",
 )
 graph_store.llm = llm
-graph_store.max_cluster_size = 5
+graph_store.max_cluster_size = 10
+graph_store.resolution = 1.0
+graph_store.randomness = 0.001
 
 
 index = PropertyGraphIndex(
