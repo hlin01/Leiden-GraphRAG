@@ -28,7 +28,6 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         Returns:
             list: A list of unique entities extracted from the retrieved nodes.
         """
-        # similarity top k doesn't work
         nodes_retrieved = self.index.as_retriever(
             similarity_top_k=similarity_top_k,
         ).retrieve(query_str)
@@ -54,7 +53,7 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         Retrieve cluster information for given entities, allowing for multiple clusters per entity.
 
         Args:
-            entity_info (dict): Mapping of entities to their cluster IDs (list).
+            entity_info (dict): Mapping of entities to their cluster IDs.
             entities (list): List of entity names.
 
         Returns:

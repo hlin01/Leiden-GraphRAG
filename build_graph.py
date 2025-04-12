@@ -63,12 +63,9 @@ Instructions:
 3. Output:
    - Provide the extracted entities and relationships in the given formats exactly as specified.
 
-Actual Data:
+Provided Text:
 ====================
-Text: {text}
-
-====================
-Output:
+{text}
 """
 
 
