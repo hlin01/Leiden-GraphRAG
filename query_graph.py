@@ -11,7 +11,7 @@ load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 
-llm = OpenAI(model="gpt-4o", temperature=0.5)
+llm = OpenAI(model="gpt-4o", temperature=1.0)
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 
 
