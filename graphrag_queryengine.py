@@ -96,7 +96,6 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         return cleaned_response
 
 
-    # pass in original query here as well?
     def aggregate_answers(self, community_answers):
         """
         Aggregate individual community answers into a final response.
